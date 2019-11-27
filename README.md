@@ -15,11 +15,12 @@ react-native version: 0.55.4<br />
 
 ## Available at
 
-Website: https://mbonus.asia/<br />
-Google Play Store: https://play.google.com/store/apps/details?id=asia.mbonus.app<br />
+Website: https://mbonus.asia/ (Laravel)<br />
+Google Play Store: https://play.google.com/store/apps/details?id=asia.mbonus.app (RN)<br />
 
 ## Reason for choosing this project as demo
 This project is integrated with GPS & multi-level marketing algorithm. I am using Redux for state management for this project. This project also support dual language by using the i18n library.
+For your information, the mbonus website & API is developed in Laravel.
 
 Thank you for your precious time for the review.
 
