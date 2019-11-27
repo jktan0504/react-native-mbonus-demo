@@ -1,0 +1,43 @@
+// COLORS
+
+export const CLR_PRIMARY = '#29ABE2';
+export const CLR_PRIMARY_DARK = '#0550A0';
+export const CLR_ACCENT = '#03a9f4';
+export const CLR_RED_ACCENT = '#FF4081';
+export const CLR_TOPBAR_BG = '#E6E7E8';
+export const CLR_TOPBAR_SEARCHBAR = '#D1D3D4';
+export const CLR_GREY = '#D1D3D4';
+export const CLR_DARK_GREY = '#A9A9A9';
+export const CLR_MORE_DARK_GREY = '#696969';
+export const CLR_LIGHT_GREY = '#E8E8E8';
+export const CLR_MORE_LIGHT_GREY = '#F5F5F5';
+export const CLR_WHITE = '#FFFFFF';
+export const CLR_BLACK = '#000000';
+export const CLR_FB = '#3B5998';
+export const CLR_TWITTER = '#00ACED';
+export const CLR_WHATSAPP = '#1EB788';
+export const CLR_WECHAT = '#41B649';
+export const CLR_TELEGRAM = '#0088CC';
+export const CLR_AMBER = '#FFC107';
+export const CLR_RED = '#F44336';
+export const CLR_AC_RED = '#EC3D5C';
+export const CLR_PURPLE = '#4B0082';
+export const CLR_BLUE_GREY = '#37474F';
+export const CLR_SHINE_BLUE = '#22ABB6';
+export const CLR_DARK_TIFFANY_BLUE = '#3EBBF9';
+export const CLR_TIFFANY_BLUE = '#8AEAFF';
+export const CLR_DARK_BLUE = '#034EA2';
+export const CLR_STATUSBAR = CLR_DARK_TIFFANY_BLUE;
+export const CLR_ACTIVE_BTM_NAVBAR = CLR_DARK_TIFFANY_BLUE;
+export const CLR_MAIN_HEADER_BAR = CLR_LIGHT_GREY;
+
+// CHAT ROOM COLOR SERIES
+export const CLR_CHAT_FROM = '#000000';
+export const CLR_CHAT_SUBJECT = '#111111';
+export const CLR_TIMESTAMP = '#4285F4';
+export const CLR_MESSAGE = '#7A7A7A';
+export const CLR_ICON_TINY_NORMAL = '#7A7A7A';
+export const CLR_ICON_TINY_SELECTED = '#FED776';
+export const CLR_ROW_ACTIVATED = '#E0E0E0';
+export const CLR_BG_ACTIVATED_MODE = '#757575';
+export const CLR_CIRCLE_DEFAULT = '#666666';

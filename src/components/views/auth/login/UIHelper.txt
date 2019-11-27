@@ -1,0 +1,805 @@
+
+
+
+            /*
+            <Container>
+                <ScrollView contentContainerStyle={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} >
+                    <Text style={{ textAlign: 'center' }}>{strings('login.login_component')}</Text>
+                    <Text>{strings('login.welcome', { name: this.props.username })}</Text>
+                    <Button
+
+                        title={strings('login.login_button')} onPress={this.changeToChinese.bind(this)}
+                    >
+                        <Text>Chinese</Text>
+                    </Button>
+
+                    <Button
+                        title={strings('login.singup_button')}
+                        onPress={this.changeToEng.bind(this)}
+                    >
+                            <Text>English</Text>
+                        </Button>
+                    <Input
+                                placeholder='Username'
+                                onChangeText={this.onUserNameTypingChangedText.bind(this)}
+                                value={this.props.username}
+                                style={{ textAlign: 'center' }}
+                                />
+                    <Item>
+                        <View>
+                            <Text >Welcome to Login</Text>
+                            <TouchableOpacity
+                                style={{ paddingLeft: 10 }}
+                                    onPress={() => this.props.navigation.navigate('SignedOut')}
+                            >
+                                <Text style={{ color: "#000000" }}>Login</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </Item>
+                    <Item >
+                        <View>
+                            <TouchableOpacity
+                                style={{ paddingLeft: 10 }}
+                                onPress={() => this.props.navigation.navigate('Register_Route')}
+                            >
+                                <Text>Register</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </Item>
+                </ScrollView>
+            </Container> */
+
+
+
+
+
+
+
+            // Register
+
+            import React, {Component} from 'react';
+            import { Alert, Platform, Dimensions, View, ScrollView, TouchableOpacity } from 'react-native';
+            import { Container, Content, Text, CheckBox, Picker,
+                    Header, Left, Button, Icon, Body, Title, Right, Form, Item, Input
+            } from 'native-base';
+            import { connect } from 'react-redux';
+            import { phoneExtOptionSelected, getPhoneExtOptionSubmit
+            } from '../../../../controllers/actions';
+            import { MBonusSpinner } from '../../../commons/Spinner';
+            import { MBonusHorizontalLine } from '../../../commons/HorizontalLine';
+            import { GoBackHeader } from '../../../commons';
+            // localize
+            import { strings } from '../../../../../locales/i18n';
+            // Colors
+            import { CLR_TIFFANY_BLUE, CLR_WHITE, CLR_BLACK, CLR_DARK_TIFFANY_BLUE
+            } from '../../../../utility/constants';
+
+
+            class RegisterComponent extends Component {
+
+                constructor(props)
+             {
+
+               super(props);
+               const options = [
+                   { id: 1, fruit_name: 'Malaysia', countryCode: '138', contactCode: '+60' },
+                   { id: 2, countryName: 'Indonesia', countryCode: '135', contactCode: '+06' },
+                   { id: 3, countryName: 'India', countryCode: '133', contactCode: '+66' },
+               ];
+
+               this.state = {
+                 dataSource: options,
+               isLoading: true,
+               selected: undefined,
+               PickerValueHolder : ''
+
+              }
+             }
+
+                componentDidMount() {
+
+                  return fetch('https://reactnativecode.000webhostapp.com/FruitsList.php')
+                    .then((response) => response.json())
+                    .then((responseJson) => {
+                      this.setState({
+                        isLoading: false,
+                        dataSource: responseJson
+                      }, function() {
+                        // In this block you can do something with new state.
+                      });
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                    });
+                }
+
+                GetPickerSelectedItemValue=()=>{
+
+                  Alert.alert(this.state.PickerValueHolder);
+
+                }
+
+                onSelectedPhoneExt(value) {
+                    console.log(`selected id ${value}`);
+                }
+
+              onValueChange(value) {
+                  console.log(`selected id ${value}`);
+                  this.state = {
+                        selected: value,
+                        isLoading: true,
+                        PickerValueHolder: '',
+                    }
+              }
+
+                      renderPhoneExtItems() {
+                          if(this.props.phone_ext_lists) {
+                              console.log(this.props.phone_ext_lists.length);
+                              this.props.phone_ext_lists.map((member, key) => {
+                                  console.log(member);
+                                  console.log(member['name']);
+                                  console.log(member['model']['ext']);
+                                  let ext_name = member['model']['ext'];
+                                  console.log(member['model']['ext']);
+                                  return (
+
+                                     <Picker.Item label='TEST' value={member['id']} key={member['model']['ext']} />
+                                  );
+                              });
+                          }
+
+            }
+
+                render() {
+                    const { mainContentContainer, mainViewContentContainer, mainFormContainerStyle,
+                            inputTextFieldContainerStyle, inputTextFieldStyle, itemRowContainerStyle,
+                            reminderTextStyle, dontHaveReferralTextStyle, inputSpinnerTextFieldContainerStyle,
+                            contactFieldLeftStyle, contactFieldRightStyle, contactInputTextFieldLeftStyle,
+                            contactInputTextFieldRightStyle, reminderTextBlackStyle,
+                            itemLocationPickerContainerStyle, inputTextFieldLargeContainerStyle,
+                            registerBtnContainerStyle, registerBtnStyle, alreadyHaveAccountTextContainerStyle,
+                            loginTextContainerStyle, alreadyHaveAccountTextStyle, alreadyHaveAccountLoginTextStyle
+                    } = styles;
+
+                    const options = [
+                        { id: 1, countryName: 'Malaysia', countryCode: '138', contactCode: '+60' },
+                        { id: 2, countryName: 'Indonesia', countryCode: '135', contactCode: '+06' },
+                        { id: 3, countryName: 'India', countryCode: '133', contactCode: '+66' },
+                    ];
+
+                    return (
+                        <Container style={mainContentContainer}>
+                            <GoBackHeader
+                                headerTitle={strings('register.register')}
+                                goBackAction={() => this.props.navigation.goBack()}
+                            />
+                            <ScrollView>
+                                <View style={mainViewContentContainer}>
+                                    <Form style={mainFormContainerStyle} >
+                                        <Item rounded style={inputTextFieldContainerStyle}>
+                                            <Input
+                                                autoCapitalize={'none'}
+                                                autoCorrect={false}
+                                                placeholder={strings('register.introducer')}
+                                                style={inputTextFieldStyle}
+                                                // onChangeText={this.onUserNameTypingChangedText.bind(this)}
+                                                // value={this.props.username}
+                                            />
+                                        </Item>
+                                        <Text style={reminderTextStyle}>
+                                            {strings('register.please_ensure_introducer_is_correct')}
+                                        </Text>
+                                        <Item style={itemRowContainerStyle}>
+                                            <CheckBox  />
+                                            <Text style={dontHaveReferralTextStyle}>
+                                                {strings('register.please_ensure_introducer_is_correct')}
+                                            </Text>
+                                        </Item>
+                                        <Item rounded style={inputTextFieldContainerStyle}>
+                                            <Input
+                                                autoCapitalize={'none'}
+                                                autoCorrect={false}
+                                                placeholder={strings('register.full_name_as_per_ic')}
+                                                style={inputTextFieldStyle}
+                                                // onChangeText={this.onUserNameTypingChangedText.bind(this)}
+                                                // value={this.props.username}
+                                            />
+                                        </Item>
+                                        <Item rounded style={inputTextFieldContainerStyle}>
+                                            <Input
+                                                autoCapitalize={'none'}
+                                                autoCorrect={false}
+                                                placeholder={strings('register.ic_number_passport_number')}
+                                                style={inputTextFieldStyle}
+                                                // onChangeText={this.onUserNameTypingChangedText.bind(this)}
+                                                // value={this.props.username}
+                                            />
+                                        </Item>
+                                        <View style={inputSpinnerTextFieldContainerStyle}>
+                                            <View style={contactFieldLeftStyle}>
+                                                <Item rounded style={contactInputTextFieldLeftStyle}>
+                                                <View style={styles.MainContainer}>
+
+                  <Picker
+                    selectedValue={this.state.PickerValueHolder}
+
+                    onValueChange={(itemValue, itemIndex) => this.setState({PickerValueHolder: itemValue})} >
+
+                    { this.state.dataSource.map((item, key)=>(
+                    <Picker.Item label={item.fruit_name} value={item.fruit_name} key={key} />)
+                    )}
+
+                  </Picker>
+
+                  <Button title="Click Here To Get Picker Selected Item Value" onPress={ this.GetPickerSelectedItemValue } />
+
+            </View>
+                                                </Item>
+                                            </View>
+                                            <View style={contactFieldRightStyle}>
+                                                <Item rounded style={contactInputTextFieldRightStyle}>
+                                                    <Input
+                                                        keyboardType={'numeric'}
+                                                        autoCapitalize={'none'}
+                                                        autoCorrect={false}
+                                                        placeholder={strings('register.contact_number')}
+                                                        style={inputTextFieldStyle}
+                                                        // onChangeText={this.onUserNameTypingChangedText.bind(this)}
+                                                        // value={this.props.username}
+                                                    />
+                                                </Item>
+                                            </View>
+                                        </View>
+                                        <Item rounded style={inputTextFieldContainerStyle}>
+                                            <Input
+                                                autoCapitalize={'none'}
+                                                autoCorrect={false}
+                                                placeholder={strings('register.email')}
+                                                style={inputTextFieldStyle}
+                                                // onChangeText={this.onUserNameTypingChangedText.bind(this)}
+                                                // value={this.props.username}
+                                            />
+                                        </Item>
+                                        <Text style={reminderTextBlackStyle}>
+                                            {strings('register.register_nationalID_reminder')}
+                                        </Text>
+                                        <MBonusHorizontalLine />
+
+                                        <Item rounded style={itemLocationPickerContainerStyle}>
+                                            <View style={{ flex: 0.3, marginLeft: 10 }}>
+                                                <Text>{strings('picker.country')}</Text>
+                                            </View>
+                                            <View style={{ flex: 0.7 }}>
+                                                <Picker
+                                                  mode="dropdown"
+                                                  enabled={false}
+                                                  placeholder="Select Country"
+                                                  iosIcon={<Icon name="ios-arrow-down-outline" />}
+                                                  placeholder={strings('picker.please_select')}
+                                                  textStyle={{ color: "#5cb85c" }}
+                                                  itemStyle={{
+                                                    backgroundColor: "#d3d3d3",
+                                                    marginLeft: 0,
+                                                    paddingLeft: 10
+                                                  }}
+                                                  itemTextStyle={{ color: '#788ad2' }}
+                                                  style={{ width: undefined }}
+                                                  selectedValue={this.state.selected}
+                                                  onValueChange={this.onValueChange.bind(this)}
+                                                >
+                                                  <Picker.Item label="Wallet" value="key0" />
+                                                  <Picker.Item label="ATM Card" value="key1" />
+                                                  <Picker.Item label="Debit Card" value="key2" />
+                                                  <Picker.Item label="Credit Card" value="key3" />
+                                                  <Picker.Item label="Net Banking" value="key4" />
+                                                  <Picker.Item label="Wallet" value="key0" />
+                                                  <Picker.Item label="ATM Card" value="key1" />
+                                                  <Picker.Item label="Debit Card" value="key2" />
+                                                  <Picker.Item label="Credit Card" value="key3" />
+                                                  <Picker.Item label="Net Banking" value="key4" />
+                                                  <Picker.Item label="Wallet" value="key0" />
+                                                  <Picker.Item label="ATM Card" value="key1" />
+                                                  <Picker.Item label="Debit Card" value="key2" />
+                                                  <Picker.Item label="Credit Card" value="key3" />
+                                                  <Picker.Item label="Net Banking" value="key4" />
+                                                  <Picker.Item label="Wallet" value="key0" />
+                                                  <Picker.Item label="ATM Card" value="key1" />
+                                                  <Picker.Item label="Debit Card" value="key2" />
+                                                  <Picker.Item label="Credit Card" value="key3" />
+                                                  <Picker.Item label="Net Banking" value="key4" />
+                                                  <Picker.Item label="Wallet" value="key0" />
+                                                  <Picker.Item label="ATM Card" value="key1" />
+                                                  <Picker.Item label="Debit Card" value="key2" />
+                                                  <Picker.Item label="Credit Card" value="key3" />
+                                                  <Picker.Item label="Net Banking" value="key4" />
+                                                  <Picker.Item label="Wallet" value="key0" />
+                                                  <Picker.Item label="ATM Card" value="key1" />
+                                                  <Picker.Item label="Debit Card" value="key2" />
+                                                  <Picker.Item label="Credit Card" value="key3" />
+                                                  <Picker.Item label="Net Banking" value="key4" />
+                                                  <Picker.Item label="Wallet" value="key0" />
+                                                  <Picker.Item label="ATM Card" value="key1" />
+                                                  <Picker.Item label="Debit Card" value="key2" />
+                                                  <Picker.Item label="Credit Card" value="key3" />
+                                                  <Picker.Item label="Net Banking" value="key4" />
+                                                  <Picker.Item label="Wallet" value="key0" />
+                                                  <Picker.Item label="ATM Card" value="key1" />
+                                                  <Picker.Item label="Debit Card" value="key2" />
+                                                  <Picker.Item label="Credit Card" value="key3" />
+                                                  <Picker.Item label="Net Banking" value="key4" />
+                                                  <Picker.Item label="Wallet" value="key0" />
+                                                  <Picker.Item label="ATM Card" value="key1" />
+                                                  <Picker.Item label="Debit Card" value="key2" />
+                                                  <Picker.Item label="Credit Card" value="key3" />
+                                                  <Picker.Item label="Net Banking" value="key4" />
+
+                                                </Picker>
+                                            </View>
+                                        </Item>
+
+                                        <Item rounded style={itemLocationPickerContainerStyle}>
+                                            <View style={{ flex: 0.3, marginLeft: 10 }}>
+                                                <Text>{strings('picker.state')}</Text>
+                                            </View>
+                                            <View style={{ flex: 0.7 }}>
+                                                <Picker
+                                                  mode="dropdown"
+                                                  placeholder="Select State"
+                                                  iosIcon={<Icon name="ios-arrow-down-outline" />}
+                                                  placeholder={strings('picker.please_select')}
+                                                  textStyle={{ color: "#5cb85c" }}
+                                                  itemStyle={{
+                                                    backgroundColor: "#d3d3d3",
+                                                    marginLeft: 0,
+                                                    paddingLeft: 10
+                                                  }}
+                                                  itemTextStyle={{ color: '#788ad2' }}
+                                                  style={{ width: undefined }}
+                                                  selectedValue={this.state.selected}
+                                                  onValueChange={this.onValueChange.bind(this)}
+                                                >
+                                                  <Picker.Item label="Wallet" value="key0" />
+                                                  <Picker.Item label="ATM Card" value="key1" />
+                                                  <Picker.Item label="Debit Card" value="key2" />
+                                                  <Picker.Item label="Credit Card" value="key3" />
+                                                  <Picker.Item label="Net Banking" value="key4" />
+                                                </Picker>
+                                            </View>
+                                        </Item>
+
+                                        <Item rounded style={itemLocationPickerContainerStyle}>
+                                            <View style={{ flex: 0.3, marginLeft: 10 }}>
+                                                <Text>{strings('picker.area')}</Text>
+                                            </View>
+                                            <View style={{ flex: 0.7 }}>
+                                                <Picker
+                                                  mode="dropdown"
+                                                  placeholder="Select Area"
+                                                  iosIcon={<Icon name="ios-arrow-down-outline" />}
+                                                  placeholder={strings('picker.please_select')}
+                                                  textStyle={{ color: "#5cb85c" }}
+                                                  itemStyle={{
+                                                    backgroundColor: "#d3d3d3",
+                                                    marginLeft: 0,
+                                                    paddingLeft: 10
+                                                  }}
+                                                  itemTextStyle={{ color: '#788ad2' }}
+                                                  style={{ width: undefined }}
+                                                  selectedValue={this.state.selected}
+                                                  onValueChange={this.onValueChange.bind(this)}
+                                                >
+                                                  <Picker.Item label="Wallet" value="key0" />
+                                                  <Picker.Item label="ATM Card" value="key1" />
+                                                  <Picker.Item label="Debit Card" value="key2" />
+                                                  <Picker.Item label="Credit Card" value="key3" />
+                                                  <Picker.Item label="Net Banking" value="key4" />
+                                                </Picker>
+                                            </View>
+                                        </Item>
+
+                                        <MBonusHorizontalLine />
+
+                                        <Item rounded style={inputTextFieldContainerStyle}>
+                                            <Input
+                                                autoCapitalize={'none'}
+                                                autoCorrect={false}
+                                                placeholder={strings('login.username')}
+                                                style={inputTextFieldStyle}
+                                                // onChangeText={this.onUserNameTypingChangedText.bind(this)}
+                                                // value={this.props.username}
+                                            />
+                                        </Item>
+
+                                        <Text style={reminderTextBlackStyle}>
+                                            {strings('register.register_username_reminder')}
+                                        </Text>
+
+                                        <Item rounded style={inputTextFieldLargeContainerStyle}>
+                                            <Input
+                                                autoCapitalize={'none'}
+                                                autoCorrect={false}
+                                                placeholder={strings('register.login_password')}
+                                                style={inputTextFieldStyle}
+                                                // onChangeText={this.onUserNameTypingChangedText.bind(this)}
+                                                // value={this.props.username}
+                                            />
+                                        </Item>
+
+                                        <Item rounded style={inputTextFieldContainerStyle}>
+                                            <Input
+                                                autoCapitalize={'none'}
+                                                autoCorrect={false}
+                                                placeholder={strings('register.login_password_confirmation')}
+                                                style={inputTextFieldStyle}
+                                                // onChangeText={this.onUserNameTypingChangedText.bind(this)}
+                                                // value={this.props.username}
+                                            />
+                                        </Item>
+
+                                        <Item rounded style={inputTextFieldLargeContainerStyle}>
+                                            <Input
+                                                autoCapitalize={'none'}
+                                                autoCorrect={false}
+                                                placeholder={strings('register.wallet_password')}
+                                                style={inputTextFieldStyle}
+                                                // onChangeText={this.onUserNameTypingChangedText.bind(this)}
+                                                // value={this.props.username}
+                                            />
+                                        </Item>
+
+                                        <Item rounded style={inputTextFieldContainerStyle}>
+                                            <Input
+                                                autoCapitalize={'none'}
+                                                autoCorrect={false}
+                                                placeholder={strings('register.wallet_password_confirmation')}
+                                                style={inputTextFieldStyle}
+                                                // onChangeText={this.onUserNameTypingChangedText.bind(this)}
+                                                // value={this.props.username}
+                                            />
+                                        </Item>
+
+                                        <Item style={registerBtnContainerStyle}>
+                                            <Button
+                                                rounded
+                                                style={registerBtnStyle}
+                                                // onPress={this.onUserForgetPasswordSubmit.bind(this)}
+                                            >
+                                                <Text>{strings('register.register')}</Text>
+                                            </Button>
+                                        </Item>
+
+                                        <Item style={alreadyHaveAccountTextContainerStyle}>
+                                            <View style={loginTextContainerStyle}>
+                                                <Text
+                                                    style={alreadyHaveAccountTextStyle}
+                                                >
+                                                    {strings('register.already_have_account')}
+                                                </Text>
+                                                <TouchableOpacity
+                                                    onPress={() => this.props.navigation.navigate('Register_Route')}
+                                                >
+                                                    <Text style={alreadyHaveAccountLoginTextStyle}>
+                                                        {strings('login.login')}
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                        </Item>
+
+                                    </Form>
+                                </View>
+                            </ScrollView>
+                        </Container>
+                    );
+                }
+            }
+
+            const styles = {
+                mainContentContainer: {
+                    flex: 1,
+                    backgroundColor: CLR_TIFFANY_BLUE
+                },
+                mainViewContentContainer: {
+                    flex: 1,
+                    flexDirection: 'column',
+                },
+                mainFormContainerStyle: {
+                    flex: 1,
+                },
+                inputTextFieldContainerStyle: {
+                    paddingLeft: 5,
+                    paddingRight: 5,
+                    paddingTop: 3,
+                    paddingBottom: 3,
+                    backgroundColor: CLR_WHITE,
+                    marginTop: 20,
+                    marginLeft: 20,
+                    marginRight: 20,
+                    height: 35,
+                },
+                inputTextFieldLargeContainerStyle: {
+                    paddingLeft: 5,
+                    paddingRight: 5,
+                    paddingTop: 3,
+                    paddingBottom: 3,
+                    backgroundColor: CLR_WHITE,
+                    marginTop: 50,
+                    marginLeft: 20,
+                    marginRight: 20,
+                    height: 35,
+                },
+                inputSpinnerTextFieldContainerStyle: {
+                    paddingLeft: 5,
+                    paddingRight: 5,
+                    paddingTop: 3,
+                    paddingBottom: 3,
+                    marginTop: 20,
+                    marginLeft: 20,
+                    marginRight: 20,
+                    height: 35,
+                    flexDirection: 'row',
+                },
+                inputTextFieldStyle: {
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                },
+                itemRowContainerStyle: {
+                    marginTop: 20,
+                    marginLeft: 20,
+                    marginRight: 20,
+                    borderBottomWidth: 0,
+                    flexDirection: 'row',
+                    justifyContent: 'space-around',
+                },
+                reminderTextStyle: {
+                    paddingTop: 3,
+                    textAlign: 'center',
+                    fontSize: 12,
+                    color: 'red',
+                },
+                dontHaveReferralTextStyle: {
+                    fontSize: 13,
+                    marginLeft: 5,
+                },
+                contactFieldLeftStyle: {
+                    flex: 3
+                },
+                contactFieldRightStyle: {
+                    flex: 5
+                },
+                contactInputTextFieldLeftStyle: {
+                    backgroundColor: CLR_WHITE,
+                    height: 35,
+                },
+                contactInputTextFieldRightStyle: {
+                    backgroundColor: CLR_WHITE,
+                    height: 35,
+                    marginLeft: 10
+                },
+                reminderTextBlackStyle: {
+                    paddingLeft: 20,
+                    paddingRight: 20,
+                    paddingTop: 10,
+                    textAlign: 'center',
+                    fontSize: 12,
+                    color: CLR_BLACK,
+                },
+                itemLocationPickerContainerStyle: {
+                    marginTop: 20,
+                    marginLeft: 20,
+                    marginRight: 20,
+                    borderBottomWidth: 0,
+                    backgroundColor: CLR_WHITE,
+                    flexDirection: 'row',
+                    justifyContent: 'space-around',
+                },
+                registerBtnContainerStyle: {
+                    marginTop: 20,
+                    marginBottom: 20,
+                    marginLeft: 40,
+                    marginRight: 40,
+                    borderBottomWidth: 0,
+                },
+                registerBtnStyle: {
+                    flex: 1,
+                    backgroundColor: CLR_DARK_TIFFANY_BLUE,
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    height: 35,
+                },
+                alreadyHaveAccountTextContainerStyle: {
+                    marginLeft: 40,
+                    marginRight: 40,
+                    marginBottom: 30,
+                    borderBottomWidth: 0,
+                },
+                loginTextContainerStyle: {
+                    flex: 1,
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                },
+                alreadyHaveAccountTextStyle: {
+                    fontSize: 14,
+                },
+                alreadyHaveAccountLoginTextStyle: {
+                    fontWeight: 'bold',
+                    fontSize: 16,
+                    marginLeft: 5,
+                },
+                MainContainer :{
+
+                justifyContent: 'center',
+                flex:1,
+                margin: 10
+                }
+
+            };
+
+            const mapStateToProps = state => {
+                return {
+                    phone_ext_id: state.country.selected_phone_ext_id,
+                    phone_ext_lists: state.country.phone_ext_lists,
+                };
+            };
+
+            export default connect(mapStateToProps, {
+                phoneExtOptionSelected,
+                getPhoneExtOptionSubmit
+             })(RegisterComponent);
+
+
+/* Root Navigation */
+import React from 'react';
+import { Platform, StatusBar } from 'react-native';
+import { createSwitchNavigator,
+         createStackNavigator,
+         createBottomTabNavigator
+       } from 'react-navigation';
+import { AuthenticateStack } from './authRouter'; // Auth Router
+
+// Screens
+// Main Screen
+import MainScreen from '../components/views/main/MainScreen';
+import HomeMainComponent from '../components/views/main/home/HomeMainComponent';
+
+// Auth Screen
+// import AuthScreen from '../components/views/auth/AuthScreen';
+
+// custom header styles
+const headerStyle = {
+  marginTop: Platform.OS === "android" ? StatusBar.currentHeight : 0
+};
+
+
+
+// MainScreen, Child StackNavigator for each Tab
+// HomeStack
+export const HomeTabStack = createStackNavigator(
+    {
+        Home: HomeMainComponent,
+    },
+    {
+        initialRouteName: 'Home',
+        /* The header config from HomeScreen is now here */
+        navigationOptions: {
+            header: null // remove header in AuthenticateStack
+        },
+    }
+);
+
+
+export const MainNavBtmTabNav = createBottomTabNavigator(
+    { Home: HomeTabStack,
+      Other: AuthenticateStack
+    },
+);
+
+export const createRootNavigator = (signedIn) => {
+  return createSwitchNavigator(
+    {
+      UnAuthRouter: {
+        screen: AuthenticateStack
+      },
+      MainAuthRouter: {
+        screen: MainNavBtmTabNav
+      }
+    },
+    {
+      initialRouteName: signedIn ? 'MainAuthRouter' : 'UnAuthRouter'
+    }
+  );
+};
+
+
+
+// TOKEN // Render Login
+getToken = async () => {
+    console.log(`GetToken is Running`);
+    try {
+        let storage_user_access_token = await AsyncStorage.getItem(ASYNCTORAGE_USER_TOKEN);
+        this.setState({ user_access_token: storage_user_access_token });
+        console.log(`From Haha HomeMainComponent ${this.state.user_access_token}`);
+    } catch (e) {
+        console.log(`error ${e}`);
+        Alert(e);
+    }
+}
+
+renderLogin() {
+    if(this.state.userLogin) {
+        return (
+            <Text style={{ color: 'green'}}>
+                User login is Online
+            </Text>
+        );
+    }
+    return (
+        <Text style={{ color: 'red'}} >
+            User login is Offline
+        </Text>
+    );
+}
+
+
+data: [
+      {
+        id: 'Grandparent',
+        name: 'Grandpa',
+        age: 78,
+        children: [
+          {
+            id: 'Me',
+            name: 'Me',
+            age: 30,
+            children: [
+              {
+                id: 'Erick',
+                name: 'Erick',
+                age: 10,
+                children: [
+                  {
+                    id: 'Erick',
+                    name: 'Erick',
+                    age: 10,
+                    children: [
+                      {
+                        id: 'Erick',
+                        name: 'Erick',
+                        age: 10,
+                      },
+                      {
+                        id: 'Rose',
+                        name: 'Rose',
+                        age: 12,
+                        children: [
+                          {
+                            id: 'Erick',
+                            name: 'Erick',
+                            age: 10,
+                          },
+                          {
+                            id: 'Rose',
+                            name: 'Rose',
+                            age: 12,
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                  {
+                    id: 'Rose',
+                    name: 'Rose',
+                    age: 12,
+                  },
+                ],
+              },
+              {
+                id: 'Rose',
+                name: 'Rose',
+                age: 12,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+};

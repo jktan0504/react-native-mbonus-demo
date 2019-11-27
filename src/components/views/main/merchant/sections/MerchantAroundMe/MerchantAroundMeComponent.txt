@@ -1,0 +1,470 @@
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { AsyncStorage, Alert, View, Dimensions, Image, FlatList,
+    Linking, Platform, PermissionsAndroid, TouchableOpacity, ImageBackground,
+} from 'react-native';
+import RNImmediatePhoneCall from 'react-native-immediate-phone-call';
+import ImageLoad from 'react-native-image-placeholder';
+import MapView, { Marker } from 'react-native-maps';
+import { connect } from 'react-redux';
+import { Container, Header, Title, Content, Footer,
+    FooterTab, Button, Left, Right, Body, Icon, Text, Item } from 'native-base';
+import { ASYNCTORAGE_USER_TOKEN, CLR_DARK_TIFFANY_BLUE, DOMAIN_URL,
+    CLR_BLUE_GREY, CLR_DARK_GREY, CLR_MORE_DARK_GREY
+} from '../../../../../../utility/constants';
+import { GoBackHeader, CountryStateIcons, MerchantCard, CardSection } from '../../../../../commons';
+import { MBonusSpinner } from '../../../../../commons/Spinner';
+import MerchantSocialIconsList from '../../parts/MerchantSocialIconsList/MerchantSocialIconsList';
+import { tokenManagerCheckLogin, tokenManagerGetAccessToken, changeSettingsLocalization
+} from '../../../../../../controllers/actions';
+import { checkUserLogin, getUserAccessToken
+} from '../../../../../../controllers/actions/AsyncStorage/MBonusAsyncStorage';
+import { getMBonusAppLanguageSetting,
+} from '../../../../../../utility/realm/app/AppSettingsRealmServices';
+import { getMerchantDetailsByID,
+} from '../../../../../../utility/networking/MBonusAuthServices';
+
+// localize
+import { strings } from '../../../../../../../locales/i18n';
+
+
+const GEOLOCATION_OPTIONS = { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 };
+const ANCHOR = { x: 0.5, y: 0.5 };
+
+const colorOfmyLocationMapMarker = 'blue';
+
+const propTypes = {
+  ...Marker.propTypes,
+  // override this prop to make it optional
+  coordinate: PropTypes.shape({
+    latitude: PropTypes.number.isRequired,
+    longitude: PropTypes.number.isRequired,
+  }),
+  children: PropTypes.node,
+  geolocationOptions: PropTypes.shape({
+    enableHighAccuracy: PropTypes.bool,
+    timeout: PropTypes.number,
+    maximumAge: PropTypes.number,
+  }),
+  heading: PropTypes.number,
+  enableHack: PropTypes.bool,
+};
+
+const defaultProps = {
+  enableHack: false,
+  geolocationOptions: GEOLOCATION_OPTIONS,
+};
+
+class MerchantAroundMeComponent extends Component {
+
+    constructor(props) {
+        super(props);
+        // AsyncStorage.clear();
+        this.state = {
+            user_pref_language: '',
+            merchantDetails: [],
+            merchantCountry: [],
+            merchantState: [],
+            isLoading: true,
+            isMounted: false,
+            showMap: false,
+            myPosition: null,
+        };
+    }
+
+    openGoogleMapLink() {
+        const { merchantDetails } = this.state;
+        const scheme = Platform.OS === 'ios' ? 'maps:0,0?q=' : 'geo:0,0?q=';
+        const latLng = `${merchantDetails.latitude != null ?
+                 merchantDetails.latitude : 3.139003},${ merchantDetails.longitude != null ?
+                           merchantDetails.longitude : 101.68685499999992}`;
+        const label = merchantDetails.name;
+        const url = Platform.OS === 'ios' ? `${scheme}${label}@${latLng}` : `${scheme}${latLng})`;
+
+        if (merchantDetails.latitude != null) {
+            this.openExternalApp(url);
+        }
+    }
+
+    openExternalApp(url) {
+        Linking.canOpenURL(url).then(supported => {
+            if (supported) {
+              Linking.openURL(url);
+            } else {
+              console.log('Don\'t know how to open URI: ' + url);
+            }
+        });
+    }
+
+    renderMap() {
+        let { heading, coordinate } = this.props;
+        const { myPosition } = this.state;
+        if (!coordinate) {
+
+          if (!myPosition) return null;
+          coordinate = myPosition;
+          heading = myPosition.heading;
+        }
+
+        const rotate = (typeof heading === 'number' && heading >= 0) ? `${heading}deg` : null;
+
+        if (myPosition) {
+            return (
+                <MapView
+                    style={styles.merchantMapStyle}
+                    initialRegion={{
+                      latitude: myPosition.latitude != null ?
+                                parseFloat(myPosition.latitude) : 3.139003,
+                      longitude: myPosition.longitude != null ?
+                                parseFloat(myPosition.longitude) : 101.68685499999992,
+                      latitudeDelta: 0.005,
+                      longitudeDelta: 0.005,
+                    }}
+                >
+                <Marker
+                style={styles.mapMarker}
+                 {...this.props}
+                 coordinate={coordinate}
+                 title='You are here'
+                 description='Here you are'
+                >
+                        <View style={{ width: 350 / 11, height: 350 / 11, backgroundColor:"rgb(90,193,209)", justifyContent: "center", alignItems: "center" }} >
+
+                        <ImageLoad
+                            style={{ width: 45, height: 45 }}
+                            loadingStyle={{ size: 'large', color: 'blue' }}
+                            placeholderSource={require('../../../../../../assets/images/merchant/shop_profile.png')}
+                            placeholderStyle={{ width: 45, height: 45  }}
+                            source={{ uri: `http://endlesstheme.com/simplify1.0/images/profile/profile4.jpg` }}
+                        />
+
+                        </View>
+
+                        }
+                        <View style={{
+                        width: 0,
+                        height: 0,
+                        backgroundColor: 'transparent',
+                        borderStyle: 'solid',
+                        borderLeftWidth: 10,
+                        borderRightWidth: 10,
+                        borderBottomWidth: 11,
+                        borderLeftColor: 'transparent',
+                        borderRightColor: 'transparent',
+                        borderBottomColor:"rgb(90,193,209)",
+                        transform: [
+                        { rotate: '180deg' }
+                        ],
+                        alignSelf: "center"
+                        }} />
+                        </Marker>
+
+                        or
+
+                        <Marker
+                            style={styles.mapMarker}
+                             {...this.props}
+                             coordinate={coordinate}
+                             title='You are here'
+                             description='Here you are'
+                        >
+                            <ImageBackground
+                                source={require('../../../../../../assets/images/locations/marker_mask.png')}
+                                style={{ flex: 1, flexDirection: 'column', width: 45, height: 45 }}
+                            >
+                                <View style={{ flex: 1, padding: 10 }}>
+                                    <ImageLoad
+                                        style={{ flex: 1 }}
+                                        loadingStyle={{ size: 'large', color: 'blue' }}
+                                        placeholderSource={require('../../../../../../assets/images/merchant/shop_profile.png')}
+                                        placeholderStyle={{ width: 30, height: 30  }}
+                                        source={{ uri: `https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0b1-O4HLvkk9CGO8KnpXf5srIwn7soX4a8dgV5Euy1Pxo1E8XTA` }}
+                                    />
+                                </View>
+
+                            </ImageBackground>
+
+                        </Marker>
+
+                </MapView>
+            );
+        }
+        else {
+            return (
+                <Image
+                    source={require('../../../../../../assets/images/locations/loading_map.gif')}
+                    style={{ flex: 1, width: null, height: 250 }}
+                />
+            );
+        }
+
+    }
+
+    componentDidMount() {
+        this.setState({
+            isMounted: true,
+        }, () => {
+            this.getUserPrefLanguage();
+            this.mounted = true;
+                // If you supply a coordinate prop, we won't try to track location automatically
+                if (this.props.coordinate) return;
+
+                if (Platform.OS === 'android') {
+                    PermissionsAndroid.requestPermission(
+                        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION)
+                    .then(granted => {
+                    if (granted && this.mounted) this.watchLocation();
+                    });
+               }
+               else {
+                 this.watchLocation();
+               }
+        });
+    }
+
+    watchLocation() {
+    // eslint-disable-next-line no-undef
+    this.watchID = navigator.geolocation.watchPosition((position) => {
+      const myLastPosition = this.state.myPosition;
+      const myPosition = position.coords;
+      if (myPosition !== myLastPosition) {
+        this.setState({ myPosition });
+      }
+    }, null, this.props.geolocationOptions);
+  }
+
+    componentWillUnmount() {
+        this.setState({ isMounted: false });
+        if (this.watchID) {
+            //navigator.geolocation.clearWatch(this.watchID);
+        }
+    }
+
+    getUserPrefLanguage = () => {
+        getMBonusAppLanguageSetting().then((locale) => {
+            this.setState({
+                user_pref_language: locale
+            });
+            console.log(locale);
+        }).catch((err) => {
+            this.setState({
+                user_pref_language: 'en'
+            });
+        });
+    }
+
+    render() {
+        const { navigation } = this.props;
+        const merchantName = navigation.getParam('merchantName',
+            strings('merchant.merchant_details')
+        );
+        const { merchantDetails, merchantCountry, merchantState } = this.state;
+        const { merchantMainContainer, merchantTopDetailsContainerStyle,
+            merchantNameTextStyle, merchantAddressTextStyle, merchantBtmDetailsContainerStyle,
+            topCardSectionStyle, btmCardSectionStyle, merchantAboutUsTextStyle,
+            btmCardTitleTextStyle, btmCardContactUsViewCallStyle, btmCardContactUsViewEmailStyle, btmCardContactUsTextStyle,
+            merchantMapStyle,
+        } = styles;
+
+        return (
+            <Container style={merchantMainContainer}>
+                <GoBackHeader
+                    headerTitle='Around Me'
+                    goBackAction={() => this.props.navigation.goBack()}
+                />
+                <View style={{ flex: 1, padding: 10 }}>
+                    {this.renderMap()}
+                </View>
+            </Container>
+        );
+    }
+}
+
+
+const SIZE = 35;
+const HALO_RADIUS = 6;
+const ARROW_SIZE = 7;
+const ARROW_DISTANCE = 6;
+const HALO_SIZE = SIZE + HALO_RADIUS;
+const HEADING_BOX_SIZE = HALO_SIZE + ARROW_SIZE + ARROW_DISTANCE;
+
+const styles = {
+    merchantMainContainer: {
+        backgroundColor: 'white',
+        paddingBottom: 10
+    },
+    merchantTopBtnViewStyle: {
+        flex: 1,
+        paddingLeft: 10,
+        paddingRight: 10,
+        paddingTop: 10,
+        paddingBottom: 10,
+        borderBottomWidth: 0,
+        justifyContent: 'center',
+
+
+    },
+    merchantTopBtnStyle: {
+        flex: 1,
+        backgroundColor: CLR_DARK_TIFFANY_BLUE,
+    },
+    merchantAroundMeIconStyle: {
+        width: 35,
+        height: 35,
+    },
+    merchantTopBtnTextStyle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    merchantTopDetailsContainerStyle: {
+        flex: 1,
+        flexDirection: 'column',
+        paddingLeft: 10,
+        paddingBottom: 10,
+        paddingTop: 10,
+        paddingRight: 10
+    },
+    merchantNameTextStyle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: CLR_BLUE_GREY,
+    },
+    merchantAddressTextStyle: {
+        fontSize: 16,
+        color: CLR_DARK_GREY,
+    },
+    merchantBtmDetailsContainerStyle: {
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        paddingLeft: 5,
+        paddingBottom: 10,
+        paddingTop: 10,
+        paddingRight: 5
+    },
+    topCardSectionStyle: {
+        flex: 1,
+        flexDirection: 'column',
+        borderBottomWidth: 2,
+        borderColor: CLR_DARK_GREY,
+    },
+    btmCardSectionStyle: {
+        flex: 1,
+        flexDirection: 'column',
+    },
+    btmCardTitleTextStyle:{
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: CLR_MORE_DARK_GREY,
+        textAlign: 'center',
+    },
+    merchantAboutUsTextStyle: {
+        color: CLR_MORE_DARK_GREY,
+        padding: 5,
+        fontSize: 16,
+        textAlign: 'justify',
+    },
+    btmCardContactUsViewCallStyle: {
+        flex: 0.4,
+        padding: 10,
+        flexDirection: 'column',
+        justifyContent: 'center',
+    },
+    btmCardContactUsViewEmailStyle: {
+        flex: 0.6,
+        padding: 10,
+        flexDirection: 'column',
+    },
+    btmCardContactUsTextStyle: {
+        fontSize: 12.5,
+        color: CLR_DARK_GREY,
+    },
+    merchantMapStyle: {
+        flex: 1,
+        height: 300,
+        marginTop: 10,
+        padding: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    // The container is necessary to protect the markerHalo shadow from clipping
+    container: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#F5FCFF',
+    },
+    triangle: {
+        width: 0,
+     height: 0,
+     backgroundColor: 'transparent',
+     borderStyle: 'solid',
+     borderTopWidth: 0,
+     borderRightWidth: 45,
+     borderBottomWidth: 90,
+     borderLeftWidth: 45,
+     borderTopColor: 'transparent',
+     borderRightColor: 'transparent',
+     borderBottomColor: 'red',
+     borderLeftColor: 'transparent',
+     },
+  heading: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: HEADING_BOX_SIZE,
+    height: HEADING_BOX_SIZE,
+    alignItems: 'center',
+  },
+  headingPointer: {
+    width: 0,
+    height: 0,
+    backgroundColor: 'transparent',
+    borderStyle: 'solid',
+    borderTopWidth: 0,
+    borderRightWidth: ARROW_SIZE * 0.75,
+    borderBottomWidth: ARROW_SIZE,
+    borderLeftWidth: ARROW_SIZE * 0.75,
+    borderTopColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: colorOfmyLocationMapMarker,
+    borderLeftColor: 'transparent',
+  },
+  markerHalo: {
+    position: 'absolute',
+    backgroundColor: 'white',
+    top: 0,
+    left: 0,
+    width: HALO_SIZE,
+    height: HALO_SIZE,
+    borderRadius: Math.ceil(HALO_SIZE / 2),
+    margin: (HEADING_BOX_SIZE - HALO_SIZE) / 2,
+    shadowColor: 'black',
+    shadowOpacity: 0.25,
+    shadowRadius: 2,
+    shadowOffset: {
+      height: 0,
+      width: 0,
+    },
+  },
+  marker: {
+    justifyContent: 'center',
+    backgroundColor: colorOfmyLocationMapMarker,
+    width: SIZE,
+    height: SIZE,
+    borderRadius: Math.ceil(SIZE / 2),
+    margin: (HEADING_BOX_SIZE - SIZE) / 2,
+  },
+
+};
+
+const mapStateToProps = state => {
+    return {
+        user_pref_language: state.locale.user_pref_language
+    };
+};
+
+export default connect(mapStateToProps, {
+    tokenManagerCheckLogin,
+    changeSettingsLocalization
+ })(MerchantAroundMeComponent);

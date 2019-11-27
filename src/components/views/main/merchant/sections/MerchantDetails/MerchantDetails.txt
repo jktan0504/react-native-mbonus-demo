@@ -1,0 +1,154 @@
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { ScrollView, View, StyleSheet, Text, Image } from 'react-native';
+import { List, ListItem } from 'react-native-elements';
+import MapView, { Marker } from 'react-native-maps';
+import Geocoder from 'react-native-geocoding';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
+const styles = StyleSheet.create({
+  container: {
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 300,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  map: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 300,
+  },
+  icons: {
+    marginTop: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+});
+
+class MeetingDetail extends Component {
+  constructor(props) {
+    super(props);
+
+    Geocoder.setApiKey('AIzaSyATgnBXSfvDPI7hDH5bq-UJCX8P_riee10');
+
+    this.state = {
+      region: {
+        latitude: 37.78825,
+        longitude: -122.4324,
+        latitudeDelta: 0.002,
+        longitudeDelta: 0.002,
+      },
+    };
+  }
+
+  componentDidMount() {
+    const { address } = this.props.navigation.state.params;
+
+    Geocoder.getFromLocation(address).then(
+      (json) => {
+        const location = json.results[0].geometry.location;
+
+        this.setState({
+          region: {
+            latitude: location.lat,
+            longitude: location.lng,
+            latitudeDelta: 0.002,
+            longitudeDelta: 0.002,
+          },
+        });
+      },
+      (error) => {
+        alert(error);
+      },
+    );
+  }
+
+  render() {
+    const {
+      name,
+      start_time: startTime,
+      address,
+      notes,
+      icons,
+    } = this.props.navigation.state.params;
+
+    console.log(icons);
+    return (
+      <ScrollView>
+        <View style={styles.container}>
+          <MapView style={styles.map} region={this.state.region} scrollEnabled showsScale>
+            <Marker
+              coordinate={{
+                latitude: this.state.region.latitude,
+                longitude: this.state.region.longitude,
+              }}
+              title={name}
+              image={require('../images/map-marker-of-original-shape.png')}
+              description={`${startTime} | ${address}`}
+            />
+          </MapView>
+        </View>
+        <View style={styles.icons}>
+          {icons.women_only ? (
+            <Image
+              source={require('../images/women_only.png')}
+              style={{ width: 36, height: 36, tintColor: '#987AC2' }}
+            />
+          ) : null}
+          {icons.one_hour ? (
+            <Image
+              source={require('../images/1_hour_icon.png')}
+              style={{ width: 36, height: 36, tintColor: '#987AC2' }}
+            />
+          ) : (
+            <Text>1.5 Hour</Text>
+          )}
+          {icons.open_meeting ? (
+            <Image
+              source={require('../images/open_meeting.png')}
+              style={{ width: 36, height: 36, tintColor: '#987AC2' }}
+            />
+          ) : (
+            <Image
+              source={require('../images/closed_meeting.png')}
+              style={{ width: 36, height: 36, tintColor: '#987AC2' }}
+            />
+          )}
+          {icons.child_friendly ? <Text>Child Friendly</Text> : null}
+          {icons.step_meeting ? <Text>Step Meeting</Text> : null}
+          {icons.polish_speaking ? <Text>Polish Speaking</Text> : null}
+          {icons.lgbt ? <Text>LGBT</Text> : null}
+        </View>
+        <List>
+          <ListItem title="Meeting Name:" rightTitle={name} hideChevron />
+          <ListItem title="Start Time:" rightTitle={startTime} hideChevron />
+        </List>
+        <List>
+          <ListItem rightTitleNumberOfLines={4} title="Address:" rightTitle={address} hideChevron />
+          {notes ? (
+            <ListItem rightTitleNumberOfLines={3} title="Notes:" rightTitle={notes} hideChevron />
+          ) : (
+            <View />
+          )}
+          <ListItem title="City:" rightTitle="Edinburgh" hideChevron />
+        </List>
+      </ScrollView>
+    );
+  }
+}
+
+MeetingDetail.propTypes = {
+  name: PropTypes.string,
+  start_time: PropTypes.string,
+  address: PropTypes.string,
+  notes: PropTypes.string,
+};
+
+export default MeetingDetail;

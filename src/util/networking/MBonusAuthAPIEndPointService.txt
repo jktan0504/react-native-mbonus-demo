@@ -1,0 +1,665 @@
+package asia.mbonus.app.utils.networking;
+
+import asia.mbonus.app.models.actions.transfer.TransferRWalletModel;
+import asia.mbonus.app.models.actions.upgrade.UpgradeToAgentModel;
+import asia.mbonus.app.models.bank.BankModel;
+import asia.mbonus.app.models.company_bank.CompanyBankModel;
+import asia.mbonus.app.models.company_representative.CompanyRepresentativeModel;
+import asia.mbonus.app.models.customer_service.chat_list.ChatRoomModel;
+import asia.mbonus.app.models.customer_service.chat_reply.ChatReplyModel;
+import asia.mbonus.app.models.location_options.area.AreaListModel;
+import asia.mbonus.app.models.location_options.country.CountryModel;
+import asia.mbonus.app.models.actions.CheckUsernameRegisterModel;
+import asia.mbonus.app.models.actions.checkupgrade_username.CheckUsernameUpgradeModel;
+import asia.mbonus.app.models.announcement.AnnouncementModel;
+import asia.mbonus.app.models.location_options.state.StateModel;
+import asia.mbonus.app.models.merchant.Around.MerchantAroundMeModel;
+import asia.mbonus.app.models.merchant.MerchantDetailsModel;
+import asia.mbonus.app.models.merchant.MerchantModel;
+import asia.mbonus.app.models.merchant.pagination.MerchantResponsePaginatedModel;
+import asia.mbonus.app.models.merchant_group.MerchantGroupModel;
+import asia.mbonus.app.models.my_community.MyCommunityModel;
+import asia.mbonus.app.models.natural_of_business.NaturalOfBusinessModel;
+import asia.mbonus.app.models.rebate.RebateModel;
+import asia.mbonus.app.models.response.refer_new_merchant.ReferNewMerchantResponseModel;
+import asia.mbonus.app.models.response.withdrawal.WithdrawalResponse;
+import asia.mbonus.app.models.settings.SettingsModel;
+import asia.mbonus.app.models.slider.SliderModel;
+import asia.mbonus.app.models.user.UserModel;
+import asia.mbonus.app.models.wallet.WalletModel;
+import asia.mbonus.app.models.withdrawal.WithdrawalModel;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
+import retrofit2.http.Headers;
+import retrofit2.http.Multipart;
+import retrofit2.http.POST;
+import retrofit2.http.Part;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
+
+public interface MBonusAuthAPIEndPointService
+{
+
+    /*
+     @POST("/oauth/token")
+    @FormUrlEncoded
+    Call<AccessToken> login(@Field("client_id") Integer client_id,
+                            @Field("client_secret") String client_secret,
+                            @Field("grant_type") String grant_type,
+                            @Field("username") String username,
+                            @Field("password") String password);
+     */
+
+
+    // GET SETTINGS
+    @GET("/setting")
+    Call<SettingsModel> getSettings();
+
+    // GET SLIDER
+    @GET("/slider")
+    Call<SliderModel> getAllSliders();
+
+    // GET ANNOUNCEMENT
+    @GET("/announcement/dt")
+    Call<AnnouncementModel> getAnnouncementList();
+
+    // GET AUTH USER DETAILS
+    @GET("/user/me")
+    Call<UserModel> getUserDetails();
+
+    // MERCHANT
+    @GET("/user/merchant/dt")
+    Call<MerchantModel> getAllMerchantLists(@Query("start") long start_item, @Query("length") long fetch_length);
+
+    // MERCHANT
+    @GET("/user/merchant/dt")
+    Call<MerchantModel> getAllMerchantListsByFilter(
+            @Query("start") long start_item,
+            @Query("length") long fetch_length,
+            @Query("filter_country_id") Integer filter_country_id,
+            @Query("filter_country_location_id") Integer filter_country_location_id,
+            @Query("filter_country_location_id_2") Integer filter_country_location_id_2,
+            @Query("filter_nature_of_business") Integer filter_nature_of_business,
+            @Query("filter_name") String filter_name
+            );
+
+
+
+    // GET MERCHANT DETAILS BY ID
+    @GET("/user/merchant/details/{id}")
+    Call<MerchantDetailsModel> getMerchantDetailsByID(@Path("id") Integer merchant_id);
+
+    // GET NEARBY MERCHANT
+    @GET("/user/nearby_merchant")
+    Call<MerchantAroundMeModel> getNearbyMerchantByLatLonKm(@Query("longitude") double longitude,
+                                                            @Query("latitude") double latitude,
+                                                            @Query("km") double km);
+
+    // Transaction 1
+    @GET("/transaction/1/dt")
+    Call<WalletModel> getTransaction1(@Query("start") long start_item, @Query("length") long fetch_length);
+
+
+    // Transaction 2
+    @GET("/transaction/2/dt")
+    Call<WalletModel> getTransaction2(@Query("start") long start_item, @Query("length") long fetch_length);
+
+
+    // Transaction 3
+    @GET("/transaction/3/dt")
+    Call<WalletModel> getTransaction3(@Query("start") long start_item, @Query("length") long fetch_length);
+
+
+    // Transaction 4
+    @GET("/transaction/4/dt")
+    Call<WalletModel> getTransaction4(@Query("start") long start_item, @Query("length") long fetch_length);
+
+
+    // Withdrawal
+    @GET("/withdrawal/dt")
+    Call<WithdrawalModel> getWithdrawalReport(@Query("start") long start_item, @Query("length") long fetch_length);
+
+    // Rebate
+    @GET("/pending_rebate/dt")
+    Call<RebateModel> getRebatePendingReport(@Query("start") long start_item, @Query("length") long fetch_length);
+
+
+
+
+
+    @GET("/user/merchant/dt?length=10&start=0")
+    Call<MerchantModel> getRangeMerchants();
+
+    @GET("/user/merchant/dt")
+    Call<MerchantResponsePaginatedModel> getAllMerchantPaginateLists(@Query("start") long start_item, @Query("length") long fetch_length);
+
+
+    // BANK
+    @GET("/bank")
+    Call<BankModel> getAllAvailableBank();
+
+    // Company Bank
+    @GET("/company_bank")
+    Call<CompanyBankModel> getAllCompanyBank();
+
+    // MERCHANT GROUP
+    @GET("/merchant_group")
+    Call<MerchantGroupModel> getAllMerchantGroup();
+
+    // Natural Of Business
+    @GET("/nature_of_business")
+    Call<NaturalOfBusinessModel> getAllNaturalOfBusiness();
+
+
+    // GET COUNTRY OPTIONS
+    @GET("/get_country_option")
+    Call<CountryModel> getAllCountryOptions();
+
+    // GET STATE OPTIONS
+    @GET("/get_state_option")
+    Call<StateModel> getAllStateOptionsByCountryID(@Query("country_id") int country_id);
+
+
+    // GET AREA OPTIONS
+    @GET("/get_area_option")
+    Call<AreaListModel> getAllAreaOptions(@Query("country_id") int country_id, @Query("country_location_id") int country_location_id);
+
+    // WALLET
+    @GET("/transaction/1/dt?length=2&start0")
+    Call<SliderModel> getAllTransactionWallet1();
+
+    // GET MY COMMUNITY
+    @GET("/user/my_community")
+    Call<MyCommunityModel> getAllCommunity();
+
+
+    // GET Company Representative _ Become ...
+    @GET("/area_representative/dt")
+    Call<CompanyRepresentativeModel> getAllCompanyRepresentativeList();
+
+    @GET("/refer_area_representative/check_username")
+    Call<CheckUsernameUpgradeModel> checkUserNameForReferRepresentative(@Query("target_username") String target_username);
+
+
+    // CHECK USERNAME AVAILABLE FOR REGISTER
+    @GET("/username_check_available")
+    Call<CheckUsernameRegisterModel> chekcUserNameForRegister(@Query("username") String username);
+
+
+    // GET CHAT ROOM LIST
+    @GET("/customer_service/dt")
+    Call<ChatRoomModel> getAllChatRoomList();
+
+    // GET CHAT ROOM DETAILS BY ID
+    @GET("/customer_service/view/{id}")
+    Call<ChatReplyModel> getChatReplyDetailsByid(@Path("id") String id);
+
+    /*
+     *
+     * ACTIONS -- POST
+     *
+     */
+    // CREATE CHAT ROOM -- OK
+    @Headers({
+            "Content-Type: application/json",
+            "Content-Type: application/x-www-form-urlencoded"
+    })
+    @FormUrlEncoded
+    @POST("/customer_service/create/post")
+    Call<ResponseBody> createChatRoom(
+            @Field("title") String title,
+            @Field("description") String description
+    );
+
+    // REPLY CHAT ROOM BY ID-- OK
+    @Headers({
+            "Content-Type: application/json",
+            "Content-Type: application/x-www-form-urlencoded"
+    })
+    @FormUrlEncoded
+    @POST(" /customer_service/reply/{id}")
+    Call<ResponseBody> replyChatRoomByID(
+            @Path("id") String id,
+            @Field("message") String message
+    );
+
+
+    // USER CHANGE LANGUAGE
+    @Headers({
+            "Content-Type: application/json",
+            "Content-Type: application/x-www-form-urlencoded"
+    })
+    @FormUrlEncoded
+    @POST("/user/change_language")
+    Call<ResponseBody> userChangeLanguage(
+            @Field("lang") String lang
+    );
+
+    // TRANSFER M WALLET  -- OK
+    @Headers({
+            "Content-Type: application/json",
+            "Content-Type: application/x-www-form-urlencoded"
+    })
+    @FormUrlEncoded
+    @POST("/transaction/1/transfer/post")
+    Call<ResponseBody> transferMWallet(
+            @Field("amount") Double amount,
+            @Field("remark") String remark,
+            @Field("current_password2") String current_password2,
+            @Field("i_confirm") Integer i_confirm
+    );
+
+    // TRANSFER R WALLET -- OK
+    @Headers({
+            "Content-Type: application/json",
+            "Content-Type: application/x-www-form-urlencoded"
+    })
+    @FormUrlEncoded
+    @POST("/transaction/2/transfer/post")
+    Call<ResponseBody> transferRWallet(
+            @Field("target_username") String target_username,
+            @Field("amount") Double amount,
+            @Field("remark") String remark,
+            @Field("current_password2") String current_password2,
+            @Field("i_confirm") Integer i_confirm
+    );
+
+    @GET("/transaction/transfer/check/username/post")
+    Call<TransferRWalletModel> checkUserNameForTransferRWallet(@Query("target_username") String target_username);
+
+
+    // UPGRADE USER TO AGENT  -- OK
+    @Headers({
+            "Content-Type: application/json",
+            "Content-Type: application/x-www-form-urlencoded"
+    })
+    @POST("/upgrade/post")
+    @FormUrlEncoded
+    Call<UpgradeToAgentModel> upgradeUserToAgentByTargetUsername(
+            @Field("current_password2") String current_password2,
+            @Field("target_username") String target_username
+    );
+
+    // UPGRADE
+    // CHECK TARGET USERNAME
+    @GET("/upgrade/check/username")
+    Call<CheckUsernameUpgradeModel> checkUsernameForUpgrade(@Query("target_username") String target_username);
+
+
+    /* BACK FOR UPGRADE
+    @Headers({
+            "Content-Type: application/json",
+            "Content-Type: application/x-www-form-urlencoded"
+    })
+    @POST("/upgrade/post")
+    @FormUrlEncoded
+    Call<UpgradeToAgentModel> upgradeUserToAgentByUsername(@Field("current_password2") String current_password2,
+                                                           @Field("target_username") String target_username);
+    */
+
+    // WITHDRAWAL SUBMIT  -- OK
+    @Headers({
+            "Content-Type: application/json",
+            "Content-Type: application/x-www-form-urlencoded"
+    })
+    @POST("/withdrawal/submit")
+    @FormUrlEncoded
+    Call<WithdrawalResponse> withdrawalRequestSubmit(
+            @Field("amount") Double amount,
+            @Field("bank_id") int bank_id,
+            @Field("current_password2") String current_password2,
+            @Field("bank_account_number") String bank_account_number,
+            @Field("national_id") String national_id,
+            @Field("i_confirm") Integer i_confirm
+    );
+
+
+    // REGISTER NEW MEMBER BY LOGGED USER
+    @Headers({
+            "Content-Type: application/json",
+            "Content-Type: application/x-www-form-urlencoded"
+    })
+    @POST("/withdrawal/submit")
+    @FormUrlEncoded
+    Call<WithdrawalResponse> registerNewMemberByUser(
+            @Field("amount") Double amount,
+            @Field("bank_id") int bank_id,
+            @Field("current_password2") String current_password2,
+            @Field("bank_account_number") String bank_account_number,
+            @Field("national_id") String national_id,
+            @Field("i_confirm") Integer i_confirm
+    );
+
+    // CHECK USERNAME FOR REGISTER
+    @GET("/username_check_available")
+    Call<ResponseBody> checkUsernameForRegister(@Query("username") String target_username);
+
+
+    // UPDATE USER DETAILS
+    @Headers({
+            "Content-Type: application/json",
+            "Content-Type: application/x-www-form-urlencoded"
+    })
+    @POST("/myprofile/save")
+    @FormUrlEncoded
+    Call<ResponseBody> updateUserDetails(
+            @Field("email") String email,
+            @Field("name") String name,
+            @Field("current_password2") String current_password2,
+            @Field("country_id") Integer country_id,
+            @Field("contact_country_id") Integer contact_country_id,
+            @Field("contact_number") String contact_number,
+            @Field("country_location_id") Integer country_location_id,
+            @Field("country_location_id_2") Integer country_location_id_2,
+            @Field("gender") Integer gender,
+            @Field("address") String address,
+            @Field("date_of_birth") String date_of_birth,
+            @Field("new_password") String new_password,
+            @Field("new_password_confirmation") String new_password_confirmation,
+            @Field("new_wallet_password") String new_wallet_password,
+            @Field("new_wallet_password_confirmation") String new_wallet_password_confirmation
+    );
+
+
+    // UPDATE USER DETAILS
+    @POST("/myprofile/save")
+    @Multipart
+    Call<ResponseBody> updateUserDetailsWithAvatar(
+            @Part("email") RequestBody email,
+            @Part("name") RequestBody name,
+            @Part("current_password2") RequestBody current_password2,
+            @Part("country_id") Integer country_id,
+            @Part("contact_country_id") Integer contact_country_id,
+            @Part("contact_number") RequestBody contact_number,
+            @Part("country_location_id") Integer country_location_id,
+            @Part("country_location_id_2") Integer country_location_id_2,
+            @Part("gender") Integer gender,
+            @Part("address") RequestBody address,
+            @Part("date_of_birth") String date_of_birth,
+            @Part("new_password") RequestBody new_password,
+            @Part("new_password_confirmation") RequestBody new_password_confirmation,
+            @Part("new_wallet_password") RequestBody new_wallet_password,
+            @Part("new_wallet_password_confirmation") RequestBody new_wallet_password_confirmation,
+            @Part MultipartBody.Part avatar
+
+    );
+
+    // Become Representative COUNTRY
+    @Headers({
+            "Content-Type: application/json",
+            "Content-Type: application/x-www-form-urlencoded"
+    })
+    @POST("/area_representative/buy/1")
+    @FormUrlEncoded
+    Call<ResponseBody> buyCountry(
+            @Field("country_id") Integer country_id,
+            @Field("current_password2") String current_password2
+    );
+
+    // Become Representative STATE
+    @Headers({
+            "Content-Type: application/json",
+            "Content-Type: application/x-www-form-urlencoded"
+    })
+    @POST("/area_representative/buy/2")
+    @FormUrlEncoded
+    Call<ResponseBody> buyState(
+            @Field("country_id") Integer country_id,
+            @Field("country_location_id") Integer country_location_id,
+            @Field("current_password2") String current_password2
+            );
+
+    // Become Representative Area
+    @Headers({
+            "Content-Type: application/json",
+            "Content-Type: application/x-www-form-urlencoded"
+    })
+    @POST("/area_representative/buy/3")
+    @FormUrlEncoded
+    Call<ResponseBody> buyArea(
+            @Field("country_id") Integer country_id,
+            @Field("country_location_id") Integer country_location_id,
+            @Field("country_location_id_2") Integer country_location_id_2,
+            @Field("current_password2") String current_password2
+    );
+
+    // SUBMIT BANK SLIP COMPANY REP
+    @POST("/area_representative/buy/details/{id}/post")
+    @Multipart
+    Call<ResponseBody> submitBankSlipCompRep(
+            @Path("id") Integer id,
+            @Part("company_bank") Integer company_bank,
+            @Part MultipartBody.Part receipt
+
+    );
+
+
+    // REFER Representative COUNTRY
+    @Headers({
+            "Content-Type: application/json",
+            "Content-Type: application/x-www-form-urlencoded"
+    })
+    @POST("/refer_area_representative/buy/1")
+    @FormUrlEncoded
+    Call<ResponseBody> referCountry(
+            @Field("target_username") String target_username,
+            @Field("country_id") Integer country_id,
+            @Field("current_password2") String current_password2
+    );
+
+    // REFER Representative STATE
+    @Headers({
+            "Content-Type: application/json",
+            "Content-Type: application/x-www-form-urlencoded"
+    })
+    @POST("/refer_area_representative/buy/2")
+    @FormUrlEncoded
+    Call<ResponseBody> referState(
+            @Field("target_username") String target_username,
+            @Field("country_id") Integer country_id,
+            @Field("country_location_id") Integer country_location_id,
+            @Field("current_password2") String current_password2
+    );
+
+    // REFER Representative Area
+    @Headers({
+            "Content-Type: application/json",
+            "Content-Type: application/x-www-form-urlencoded"
+    })
+    @POST("/refer_area_representative/buy/3")
+    @FormUrlEncoded
+    Call<ResponseBody> referArea(
+            @Field("target_username") String target_username,
+            @Field("country_id") Integer country_id,
+            @Field("country_location_id") Integer country_location_id,
+            @Field("country_location_id_2") Integer country_location_id_2,
+            @Field("current_password2") String current_password2
+    );
+
+
+    // REGISTER NEW MEMBER
+    @Headers({
+            "Content-Type: application/json",
+            "Content-Type: application/x-www-form-urlencoded"
+    })
+    @POST("/refer_new_member/post")
+    @FormUrlEncoded
+    Call<ResponseBody> refer_new_member
+    (
+            @Field("lang") String lang,
+            @Field("registration_type") Integer registration_type,
+            @Field("username") String username,
+            @Field("name") String name,
+            @Field("national_id") String national_id,
+            @Field("contact_number") String contact_number,
+            @Field("gender") Integer gender,
+            @Field("email") String email,
+            @Field("contact_country_id") Integer contact_country_id,
+            @Field("country_id") Integer country_id,
+            @Field("country_location_id") Integer country_location_id,
+            @Field("country_location_id_2") Integer country_location_id_2,
+            @Field("password") String password,
+            @Field("password_confirmation") String password_confirmation,
+            @Field("password2") String password2,
+            @Field("password2_confirmation") String password2_confirmation,
+            @Field("current_password2") String current_password2,
+            @Field("i_confirm") Integer i_confirm,
+            @Field("i_agree") Integer i_read
+
+    );
+
+
+    // Refer to new Merchant -- OK -- WITH SUPPORTING DOCUMENT
+    @POST("/refer_new_merchant/post")
+    @Multipart
+    Call<ResponseBody> referNewMerchantWithSupportingDocumenty(
+            @Part("name") RequestBody name,
+            @Part("email") RequestBody email,
+            @Part("nature_of_business_1") Integer nature_of_business_1,
+            @Part("nature_of_business_2") Integer nature_of_business_2,
+            @Part("nature_of_business_3") Integer nature_of_business_3,
+            @Part("rebate_to_offer") Double rebate_to_offer,
+            @Part("pic_name") RequestBody pic_name,
+            @Part("pic_contact_number") RequestBody pic_contact_number,
+            @Part("group_id") Integer group_id,
+            @Part("i_confirm") Integer i_confirm,
+            @Part("bank_reference_number") RequestBody bank_reference_number,
+            @Part("current_password2") RequestBody current_password2,
+            @Part("country_id") Integer country_id,
+            @Part("contact_country_id") Integer contact_country_id,
+            @Part("country_location_id") Integer country_location_id,
+            @Part("country_location_id_2") Integer country_location_id_2,
+            @Part("company_bank") Integer company_bank,
+            @Part("remark") RequestBody remark,
+            @Part MultipartBody.Part company_logo_attachment,
+            @Part MultipartBody.Part name_card_attachment,
+            @Part MultipartBody.Part ssm_attachment,
+            @Part MultipartBody.Part receipt,
+            @Part MultipartBody.Part invoice
+    );
+
+    // Refer to new Merchant -- OK -- WITHOUT SUPPORTING DOCUMENT
+    @POST("/refer_new_merchant/post")
+    @Multipart
+    Call<ResponseBody> referNewMerchantWithNoSupportingDocumenty(
+            @Part("name") RequestBody name,
+            @Part("email") RequestBody email,
+            @Part("nature_of_business_1") Integer nature_of_business_1,
+            @Part("nature_of_business_2") Integer nature_of_business_2,
+            @Part("nature_of_business_3") Integer nature_of_business_3,
+            @Part("rebate_to_offer") Double rebate_to_offer,
+            @Part("pic_name") RequestBody pic_name,
+            @Part("pic_contact_number") RequestBody pic_contact_number,
+            @Part("group_id") Integer group_id,
+            @Part("i_confirm") Integer i_confirm,
+            @Part("bank_reference_number") RequestBody bank_reference_number,
+            @Part("current_password2") RequestBody current_password2,
+            @Part("country_id") Integer country_id,
+            @Part("contact_country_id") Integer contact_country_id,
+            @Part("country_location_id") Integer country_location_id,
+            @Part("country_location_id_2") Integer country_location_id_2,
+            @Part("company_bank") Integer company_bank,
+            @Part("remark") RequestBody remark,
+            @Part MultipartBody.Part company_logo_attachment,
+            @Part MultipartBody.Part name_card_attachment,
+            @Part MultipartBody.Part ssm_attachment,
+            @Part MultipartBody.Part receipt
+    );
+
+
+
+
+
+
+
+    // Refer to new Merchant -- Failed 2
+    @POST("/refer_new_merchant/post")
+    @Multipart
+    Call<ResponseBody> referMyNewMerchantError2(
+            @Part("name") RequestBody name,
+            @Part("email") RequestBody email,
+            @Part("nature_of_business_1") Integer nature_of_business_1,
+            @Part("nature_of_business_2") Integer nature_of_business_2,
+            @Part("nature_of_business_3") Integer nature_of_business_3,
+            @Part("rebate_to_offer") Double rebate_to_offer,
+            @Part("pic_name") RequestBody pic_name,
+            @Part("pic_contact_number") RequestBody pic_contact_number,
+            @Part("group_id") Integer group_id,
+            @Part("i_confirm") Integer i_confirm,
+            @Part("bank_reference_number") RequestBody bank_reference_number,
+            @Part("current_password2") RequestBody current_password2,
+            @Part("country_id") Integer country_id,
+            @Part("contact_country_id") Integer contact_country_id,
+            @Part("country_location_id") Integer country_location_id,
+            @Part("country_location_id_2") Integer country_location_id_2,
+            @Part("company_bank") Integer company_bank,
+            @Part("remark") RequestBody remark
+    );
+
+
+    // REFER TO NEW MERCHANT --ERROR - LAG
+    @POST("/refer_new_merchant/post")
+    @Multipart
+    Call<ReferNewMerchantResponseModel> referNewMerchantError(
+            @Part("name") String name,
+            @Part("email") String email,
+            @Part("nature_of_business_1") Integer nature_of_business_1,
+            @Part("nature_of_business_2") Integer nature_of_business_2,
+            @Part("nature_of_business_3") Integer nature_of_business_3,
+            @Part("rebate_to_offer") Double rebate_to_offer,
+            @Part("pic_name") String pic_name,
+            @Part("pic_contact_number") String pic_contact_number,
+            @Part("group_id") Integer group_id,
+            @Part("i_confirm") Integer i_confirm,
+            @Part("bank_reference_number") String bank_reference_number,
+            @Part("current_password2") String current_password2,
+            @Part("country_id") Integer country_id,
+            @Part("country_location_id") Integer country_location_id,
+            @Part("country_location_id_2") Integer country_location_id_2,
+            @Part("company_bank") Integer company_bank,
+            @Part MultipartBody.Part name_card_attachment,
+            @Part MultipartBody.Part ssm_attachment,
+            @Part MultipartBody.Part receipt
+           // @Part MultipartBody.Part invoice
+    );
+
+
+
+
+
+
+
+
+/*
+
+    // UPDATE USER DETAILS  -- ERROR 422
+    @PUT("/myprofile/save")
+    @FormUrlEncoded
+    Call<UserPutUpdateModel> updateUserDetailsPUT(
+            @Field("email") String email,
+            @Field("name") String name,
+            @Field("current_password2") String current_password2,
+            @Field("country_id") String country_id,               // malaysia
+            @Field("contact_country_id") Integer contact_country_id, // 133
+            @Field("contact_number") String contact_number
+    );
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+}

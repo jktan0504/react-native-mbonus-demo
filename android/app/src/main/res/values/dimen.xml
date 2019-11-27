@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="splashLogoSize">90dp</dimen>
+    <dimen name="topBarHeight">50dp</dimen>
+    <dimen name="margin_input_form_left_right">20dp</dimen>
+    <dimen name="margin_input_form_top_bottom">12dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="padding_list_row">16dp</dimen>
+    <dimen name="messages_padding_left">72dp</dimen>
+    <dimen name="icon_width_height">40dp</dimen>
+    <dimen name="msg_text_primary">14sp</dimen>
+    <dimen name="msg_text_secondary">12sp</dimen>
+    <dimen name="icon_star">25dp</dimen>
+    <dimen name="icon_text">22dp</dimen>
+    <dimen name="timestamp">12dp</dimen>
+</resources>
